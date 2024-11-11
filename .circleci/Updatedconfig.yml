@@ -1,0 +1,43 @@
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+# Define jobs to be invoked in workflows.
+jobs:
+  say-hello:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+
+  # SonarQube analysis job
+  sonarqube:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: /build
+    steps:
+      - checkout
+      - run:
+          name: "Install SonarQube Scanner"
+          command: |
+            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+            unzip sonar-scanner.zip -d /usr/local
+            export PATH="/usr/local/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+      - run:
+          name: "Run SonarQube Analysis"
+          command: |
+            sonar-scanner \
+              -Dsonar.projectKey=my_project_key \
+              -Dsonar.organization=$SONAR_ORG \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
+
+# Orchestrate jobs using workflows
+workflows:
+  say-hello-workflow:
+    jobs:
+      - say-hello
+      - sonarqube
