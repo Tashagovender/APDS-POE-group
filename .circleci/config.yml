@@ -1,38 +1,36 @@
 version: 2.1
 
 jobs:
-  sonarqube_scan:
+  sonar-scanner:
     docker:
-      - image: circleci/python:3.8  # Replace with an appropriate base image (e.g., 'circleci/php:7.4') or install PHP
+      - image: circleci/python:3.8  # Change this to your app's environment (e.g., node, java, etc.)
+    working_directory: ~/repo
     steps:
-      - checkout
-      - run:
-          name: Install PHP
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y php php-cli php-mbstring php-xml php-curl
+      - checkout  # Check out the code from GitHub
       - run:
           name: Install dependencies
           command: |
-            curl -sS https://getcomposer.org/installer | php
-            php composer.phar install
+            # Install any dependencies for your application
+            pip install -r requirements.txt  # Example for Python, adjust accordingly for your project
       - run:
           name: Install SonarScanner
           command: |
-            curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.6.2.2472-linux.zip -o /tmp/sonar-scanner.zip
-            unzip /tmp/sonar-scanner.zip -d /opt
-            export PATH=$PATH:/opt/sonar-scanner-4.6.2.2472-linux/bin
+            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+            unzip sonar-scanner.zip
+            mv sonar-scanner-*/ sonar-scanner
       - run:
-          name: Run SonarQube Scan
+          name: Run SonarQube scan
           command: |
-            sonar-scanner \
+            sonar-scanner/bin/sonar-scanner \
               -Dsonar.projectKey=your_project_key \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.login=$SONAR_TOKEN
+              -Dsonar.organization=your_organization_key \
+              -Dsonar.host.url=https://your.sonarqube.server.url \
+              -Dsonar.login=$SONAR_TOKEN  # Environment variable for authentication
 
 workflows:
   version: 2
   build:
     jobs:
-      - sonarqube_scan
+      - sonar-scanner
+
 
