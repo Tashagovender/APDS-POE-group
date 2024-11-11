@@ -1,0 +1,33 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine
+version: 2.1
+
+# Define the jobs to be invoked in workflows
+jobs:
+  # SonarQube analysis job
+  sonarqube:
+    docker:
+      - image: cimg/openjdk:11.0  # Use an image with Java for SonarQube
+    working_directory: ~/project  # Set the working directory to a writable path
+    steps:
+      - checkout  # Check out the code from your GitHub repository
+      - run:
+          name: "Install SonarQube Scanner"
+          command: |
+            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+            unzip sonar-scanner.zip -d /usr/local
+            export PATH="/usr/local/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+      - run:
+          name: "Run SonarQube Analysis"
+          command: |
+            sonar-scanner \
+              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+              -Dsonar.organization=$SONAR_ORG \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
+
+# Orchestrate jobs using workflows
+workflows:
+  sonar-workflow:
+    jobs:
+      - sonarqube
