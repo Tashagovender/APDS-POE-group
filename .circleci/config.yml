@@ -9,14 +9,17 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # For a Java project (e.g. Maven), replace this with the required steps for your language
-            curl -sS https://getcomposer.org/installer | php  # Example for PHP
-            composer install  # Replace this with `npm install`, `mvn install`, etc. based on your project
+            # For a Node.js project
+            # npm install
+
+            # For a Java project (replace with the necessary steps for your project)
+            curl -sS https://getcomposer.org/installer | php
+            composer install  # This is only needed if you're using PHP. If not, remove this.
       - run:
           name: Install SonarScanner
           command: |
-            curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.6.2.2472-linux.zip -o sonar-scanner.zip
-            unzip sonar-scanner.zip -d /opt
+            curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.6.2.2472-linux.zip -o /tmp/sonar-scanner.zip
+            unzip /tmp/sonar-scanner.zip -d /opt
             export PATH=$PATH:/opt/sonar-scanner-4.6.2.2472-linux/bin
       - run:
           name: Run SonarQube Scan
