@@ -3,18 +3,19 @@ version: 2.1
 jobs:
   sonarqube_scan:
     docker:
-      - image: circleci/python:3.8  # Use the appropriate Docker image for your language
+      - image: circleci/python:3.8  # Replace with an appropriate base image (e.g., 'circleci/php:7.4') or install PHP
     steps:
       - checkout
       - run:
+          name: Install PHP
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y php php-cli php-mbstring php-xml php-curl
+      - run:
           name: Install dependencies
           command: |
-            # For a Node.js project
-            # npm install
-
-            # For a Java project (replace with the necessary steps for your project)
             curl -sS https://getcomposer.org/installer | php
-            composer install  # This is only needed if you're using PHP. If not, remove this.
+            php composer.phar install
       - run:
           name: Install SonarScanner
           command: |
@@ -34,3 +35,4 @@ workflows:
   build:
     jobs:
       - sonarqube_scan
+
