@@ -1,46 +1,33 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define jobs to be invoked in workflows.
 jobs:
-  say-hello:
+  sonarqube_scan:
     docker:
-      - image: cimg/base:current
+      - image: circleci/python:3.8  # Use the appropriate Docker image for your language
     steps:
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
-
-  # SonarQube analysis job
-  sonarqube:
-    docker:
-      # Use an image that has Java, as SonarQube scanner requires it
-      - image: cimg/openjdk:11.0
-    working_directory: /build
-    steps:
-      - checkout
-      - run:
-          name: "Install SonarQube Scanner"
+          name: Install dependencies
           command: |
-            curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-            unzip sonar-scanner.zip -d /usr/local
-            export PATH="/usr/local/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
+            # For a Java project (e.g. Maven), replace this with the required steps for your language
+            curl -sS https://getcomposer.org/installer | php  # Example for PHP
+            composer install  # Replace this with `npm install`, `mvn install`, etc. based on your project
       - run:
-          name: "Run SonarQube Analysis"
+          name: Install SonarScanner
+          command: |
+            curl -sS https://downloads.sonarsource.com/sonar-scanner-cli/sonar-scanner-4.6.2.2472-linux.zip -o sonar-scanner.zip
+            unzip sonar-scanner.zip -d /opt
+            export PATH=$PATH:/opt/sonar-scanner-4.6.2.2472-linux/bin
+      - run:
+          name: Run SonarQube Scan
           command: |
             sonar-scanner \
-              -Dsonar.projectKey=Tashagovender_APDS-POE-group \
-              -Dsonar.organization=tashagovender \
-              -Dsonar.sources=. \
-              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.projectKey=your_project_key \
+              -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.login=$SONAR_TOKEN
 
-# Orchestrate jobs using workflows
 workflows:
-  say-hello-workflow:
+  version: 2
+  build:
     jobs:
-      - say-hello
-      - sonarqube
-
+      - sonarqube_scan
