@@ -3,13 +3,13 @@ version: 2.1
 jobs:
   sonar-scanner:
     docker:
-      - image: circleci/python:3.8  # Change this to a Node.js image if using Node.js, e.g., circleci/node:14
+      - image: circleci/node:14  # Using a Node.js image with npm included
     working_directory: ~/repo
     steps:
-      - checkout
+      - checkout  # Check out the code from GitHub
       - run:
           name: Install dependencies
-          command: npm install  # Adjust this based on your package manager (npm, yarn, etc.)
+          command: npm install  # Installs dependencies for a Node.js project
       - run:
           name: Install SonarScanner
           command: |
@@ -30,6 +30,4 @@ workflows:
   build:
     jobs:
       - sonar-scanner
-
-
 
