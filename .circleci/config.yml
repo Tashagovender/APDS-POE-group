@@ -3,15 +3,13 @@ version: 2.1
 jobs:
   sonar-scanner:
     docker:
-      - image: circleci/python:3.8  # Change this to your app's environment (e.g., node, java, etc.)
+      - image: circleci/python:3.8  # Change this to a Node.js image if using Node.js, e.g., circleci/node:14
     working_directory: ~/repo
     steps:
-      - checkout  # Check out the code from GitHub
+      - checkout
       - run:
           name: Install dependencies
-          command: |
-            # Install any dependencies for your application
-            pip install -r requirements.txt  # Example for Python, adjust accordingly for your project
+          command: npm install  # Adjust this based on your package manager (npm, yarn, etc.)
       - run:
           name: Install SonarScanner
           command: |
@@ -25,12 +23,13 @@ jobs:
               -Dsonar.projectKey=your_project_key \
               -Dsonar.organization=your_organization_key \
               -Dsonar.host.url=https://your.sonarqube.server.url \
-              -Dsonar.login=$SONAR_TOKEN  # Environment variable for authentication
+              -Dsonar.login=$SONAR_TOKEN  # SonarQube token secret
 
 workflows:
   version: 2
   build:
     jobs:
       - sonar-scanner
+
 
 
